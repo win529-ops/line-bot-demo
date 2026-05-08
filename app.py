@@ -101,9 +101,11 @@ def handle_image(event):
 # 貼圖訊息事件
 @handler.add(MessageEvent, message=StickerMessage)
 def handle_sticker(event):
+    time_period = get_time_period()
+    reply_text = f"{time_period}，收到可愛的貼圖😊"
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=f"{time_period}，收到可愛的貼圖！😊")
+        TextSendMessage(text=reply_text)
     )
 
 if __name__ == "__main__":
