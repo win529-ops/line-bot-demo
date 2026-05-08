@@ -7,7 +7,8 @@ from linebot.models import (
 )
 import os
 import random
-import datetime
+from datetime import datetime, timedelta, timezone
+
 
 app = Flask(__name__)
 
@@ -42,7 +43,10 @@ reply_templates = {
 emoji_list = ["😊", "🌸", "☀️", "🌹", "🍵", "🍞", "🎉", "❤️"]
 
 def get_time_period():
-    hour = datetime.datetime.now().hour
+    tz = timezone(timedelta(hours=8))
+    now = datetime.now(tz)
+    hour = now.hour
+
     if 5 <= hour < 11:
         return "morning"
     elif 11 <= hour < 17:
