@@ -103,7 +103,7 @@ def handle_image(event):
 def handle_sticker(event):
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="早安，收到可愛的貼圖！😊")
+        TextSendMessage(text=f"{time_period}，收到可愛的貼圖！😊")
     )
 
 if __name__ == "__main__":
