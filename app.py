@@ -1,8 +1,10 @@
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, ImageMessage, TextSendMessage
-
+from linebot.models import (
+    MessageEvent, TextMessage, ImageMessage, StickerMessage,
+    TextSendMessage
+)
 import os
 import random
 import datetime
@@ -13,7 +15,7 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
-# --- 回覆模板與邏輯 ---
+# --- 回覆模板 ---
 reply_templates = {
     "text_blessing": [
         "早安，祝你今天心情愉快",
@@ -73,13 +75,7 @@ def callback():
         abort(400)
     return 'OK'
 
-@handler.add(MessageEvent, message=ImageMessage)
-def handle_image(event):
-    # TODO: 這裡要接上圖片辨識 (OCR/分類)，目前先假設是早餐圖片
-    image_category = "coffee_breakfast"
-    reply_text = generate_reply(image_category)
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-
+# 文字訊息事件
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     line_bot_api.reply_message(
@@ -87,7 +83,25 @@ def handle_message(event):
         TextSendMessage(text="Hello, World")
     )
 
+# 圖片訊息事件（早安圖）
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image(event):
+    # TODO: 這裡可以接上 OCR/分類，目前先假設是早餐圖片
+    image_category = "coffee_breakfast"
+    reply_text = generate_reply(image_category)
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=reply_text)
+    )
+
+# 貼圖訊息事件
+@handler.add(MessageEvent, message=StickerMessage)
+def handle_sticker(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="早安，收到可愛的貼圖！😊")
+    )
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
